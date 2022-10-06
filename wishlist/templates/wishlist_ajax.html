@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        get_data_barang();
+        $("new-data").submit(function( event ) {
+            event.preventDefault();
+
+            var actionurl = event.currentTarget.action;
+
+            $.ajax({
+                    url: actionurl,
+                    type: 'post',
+                    dataType: 'json',
+                    data: $("new-data").serialize(),
+                    success: function(data) {
+                        var tr = $("<tr></tr>");
+                        for (const [key, value] of Object.entries(data)) {
+                            var td = $("<td></td>").html(value);
+                            tr.append(td);
+                        }
+                        $("#tabel-wishlist").append(tr);
+                    },
+                    error: function(){
+                        alert("Error");
+                    }
+            });
+        });
+    });
+
+    function get_data_barang() {
+        $.get("../json", function(data) {
+            data.forEach(element => {
+                var tr = $("<tr></tr>");
+                for (const [key, value] of Object.entries(element.fields)) {
+                    var td = $("<td></td>").html(value);
+                    tr.append(td);
+                }
+                $("#tabel-wishlist").append(tr);
+            });
+        });
+    }
+</script>
+{% endblock meta %}
+
+{% block content %}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" >
+    <div class="container-fluid">
+        <a class="navbar-brand">{{nama}}</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/wishlist/xml/">XML</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/wishlist/json/">JSON</a>
+            </li>
+        </ul button type="submit"></button>
+        <a href="/wishlist/logout/" class="btn btn-danger">Logout</a></button>
+        </div>
+    </div>
+</nav>
+
+<br>
+<h1 class="text-center">✨ My Wishlist ✨</h1>
+<br>
+
+<div class="mx-auto" style="width: 1000px;">
+    <table id="tabel-wishlist" class="table table-striped table-bordered" border="3" cellpadding="10">
+        <thead class="table-warning text-uppercase">
+            <tr>
+                <th scope="col" class="align-middle text-center" >Nama Barang</th>
+                <th scope="col" class="align-middle text-center">Harga Barang</th>
+                <th scope="col" class="align-middle text-center">Deskripsi</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+    </table>
+</div>
+<br>
+<h6 class="text-center">Sesi terakhir login: {{ last_login }}</h6>
+<br>
+
+<div>
+    <h4 class="text-center">Add New Wishlist</h4>
+    <form method="POST" action="{% url 'wishlist:add_wishlist' %}">
+        {% csrf_token %}
+        <br>
+        <table class="d-flex justify-content-center">
+            <tr>
+                <td>Nama Barang</td>
+                <td><input type="text" name="nama_barang" placeholder="nama barang" class="form-control"></td>
+            </tr>
+                    
+            <tr>
+                <td>Harga Barang</td>
+                <td><input type="text" name="harga_barang" placeholder="harga barang" class="form-control"></td>
+            </tr>
+
+            <tr>
+                <td>Deskripsi</td>
+                <td><input type="text" name="deskripsi" placeholder="deskripsi barang" class="form-control"></td>
+            </tr>
+        </table>
+        <br>
+        <center><input class="btn btn-warning" type="submit" value="Add Item"></center>
+    </form>
+</div>
+
+{% endblock content %}
